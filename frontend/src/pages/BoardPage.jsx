@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { api } from "../api/api";
 import { createPortal } from "react-dom";
+import CardModal from "../components/CardModal";
 
 function DraggablePortal({ isDragging, children }) {
   if (!isDragging) return children;
@@ -139,6 +140,7 @@ function AddCard({ listId, onCreated }) {
 export default function BoardPage() {
   const { boardId } = useParams();
   const navigate = useNavigate();
+  const [selectedCard, setSelectedCard] = useState(null);
 
   const [saving, setSaving] = useState(false);
   const [board, setBoard] = useState(null);
@@ -315,6 +317,7 @@ export default function BoardPage() {
                                             ? "transform 0.2s"
                                             : "none",
                                         }}
+                                        onClick={() => setSelectedCard(card)}
                                       >
                                         {/* Labels */}
                                         <div className="flex gap-2 mb-1 flex-wrap">
@@ -370,6 +373,13 @@ export default function BoardPage() {
         </DragDropContext>
         <AddList boardId={boardId} onCreated={fetchBoard} />
       </div>
+      <CardModal
+        open={!!selectedCard}
+        onClose={() => setSelectedCard(null)}
+        board={board}
+        card={selectedCard}
+        refreshBoard={fetchBoard}
+      />
     </div>
   );
 }
