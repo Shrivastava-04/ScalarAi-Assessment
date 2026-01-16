@@ -141,6 +141,7 @@ export default function BoardPage() {
   const { boardId } = useParams();
   const navigate = useNavigate();
   const [selectedCard, setSelectedCard] = useState(null);
+  const [listDeleting, setListDeleting] = useState(false);
 
   const [saving, setSaving] = useState(false);
   const [board, setBoard] = useState(null);
@@ -161,6 +162,17 @@ export default function BoardPage() {
       </div>
     );
   }
+  const handleDeleteList = async (listId) => {
+    try {
+      setListDeleting(true);
+      await api.delete(`/lists/${listId}`);
+      fetchBoard();
+      setListDeleting(false);
+    } catch (err) {
+      setListDeleting(false);
+      console.error(err);
+    }
+  };
 
   const onDragEnd = async (result) => {
     const { source, destination, type } = result;
@@ -285,7 +297,12 @@ export default function BoardPage() {
                           <div className="font-semibold text-sm">
                             {list.title}
                           </div>
-                          <div className="text-white/50 text-sm">⋯</div>
+                          <div
+                            className="text-white/50 text-sm cursor-pointer"
+                            onClick={() => handleDeleteList(list.id)}
+                          >
+                            X
+                          </div>
                         </div>
 
                         {/* Cards */}
@@ -380,6 +397,11 @@ export default function BoardPage() {
         card={selectedCard}
         refreshBoard={fetchBoard}
       />
+      {listDeleting && (
+        <div className="absolute inset-0 bg-black/50 grid place-items-center text-white font-medium text-lg">
+          Deleting list...
+        </div>
+      )}
     </div>
   );
 }
